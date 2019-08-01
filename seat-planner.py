@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 import csv
 from collections import Counter
+import argparse
 
 from constraint import *
 
@@ -118,26 +120,32 @@ class DifferentTableConstraint(Constraint):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--limit", type=int, default=10, help="max solutions to return")
+    parser.add_argument("--tables", type=int, default=4, help="num tables")
+    parser.add_argument("--guests", default="guests", help="path to file with guest names, one per line")
+    parser.add_argument("--prefer", default="prefer.csv", help="path to file with preferred guest pairs")
+    parser.add_argument("--avoid", default="avoid.csv", help="path to file with preferred guest pairs")
+    args = parser.parse_args()
+
     guests = set()
     prefer = []
     avoid = []
-    with open("guests") as f:
+    with open(args.guests) as f:
         for l in f:
             guests.add(l.strip())
-    with open("prefer.csv") as f:
+    with open(args.prefer) as f:
         reader = csv.reader(f)
         for r in reader:
             prefer.append((r[0].strip(), r[1].strip()))
-    with open("avoid.csv") as f:
+    with open(args.avoid) as f:
         reader = csv.reader(f)
         for r in reader:
             avoid.append((r[0].strip(), r[1].strip()))
 
-    # subset for profiling
-    # guests = list(sorted(guests))[:10]
-    num_tables = 4
-    print("Guests:")
-    print(guests)
+    num_tables = args.tables
+    print(f"Number of tables: {num_tables}")
+    print(f"Guests: {guests}")
     total_guests = len(guests)
     per_table = int((total_guests+1)/num_tables) + 1
     print(f"Total guests: {total_guests} per table: {per_table}")
@@ -161,13 +169,6 @@ def main():
                 raise Exception(f"{a[0]} not in guests!")
             if a[1] not in guests:
                 raise Exception(f"{a[1]} not in guests!")
-    solution = problem.getSolution()
-    if solution is None:
-        print("no solution?")
-        return
-
-#    print("At least one solution!")
-#    print_solution(solution)
 
     print("\nSolutions:\n")
     solutions = problem.getSolutionIter()
@@ -177,7 +178,7 @@ def main():
         print(f"Solution #{num_solutions}:")
         print_solution(s)
         print()
-        if num_solutions > 10:
+        if num_solutions >= args.limit:
             break
 
 
