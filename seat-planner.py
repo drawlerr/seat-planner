@@ -147,7 +147,7 @@ def main():
     print(f"Number of tables: {num_tables}")
     print(f"Guests: {guests}")
     total_guests = len(guests)
-    per_table = int((total_guests+1)/num_tables) + 1
+    per_table = int((total_guests+1)/num_tables) 
     print(f"Total guests: {total_guests} per table: {per_table}")
 
     problem = Problem()
